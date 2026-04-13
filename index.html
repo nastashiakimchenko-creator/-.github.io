@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car Upgrades</title>
+    <title>Car Upgrades - Shop Management System</title>
     <style>
         * {
             box-sizing: border-box;
         }
         body {
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            max-width: 800px;
+            max-width: 1200px;
             margin: 2rem auto;
             padding: 1rem;
-            background-color: #f5f5f5;
+            background-color: #f0f2f5;
         }
         .container {
             background: white;
@@ -29,41 +29,126 @@
             gap: 0.5rem;
             font-size: 1.8rem;
         }
-        .total-bar {
-            background: #1a1a2e;
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
+        
+        /* Two-column layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
             margin-bottom: 2rem;
-            flex-wrap: wrap;
-            gap: 0.5rem;
         }
-        .total-label {
-            font-size: 1rem;
+        
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+        
+        /* Left Column - Customer Info & Upgrades */
+        .customer-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 1.5rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .customer-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+        .customer-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .customer-field {
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            backdrop-filter: blur(10px);
+        }
+        .customer-field label {
+            display: block;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-weight: 500;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
         }
-        .total-amount {
-            font-size: 2rem;
-            font-weight: 800;
-            font-family: monospace;
+        .customer-field input, .customer-field textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 500;
+            outline: none;
+            padding: 0.25rem 0;
+            font-family: inherit;
+        }
+        .customer-field textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .customer-field input::placeholder, .customer-field textarea::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+        .customer-field input:focus, .customer-field textarea:focus {
+            border-bottom: 2px solid white;
+        }
+        
+        /* Upgrades List */
+        .upgrades-section {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 20px;
+            padding: 1rem;
+        }
+        .upgrades-header {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .search-area {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        .search-area input {
+            width: 100%;
+            padding: 0.6rem 1rem 0.6rem 2.3rem;
+            border-radius: 40px;
+            border: 1px solid #dee2e6;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+            opacity: 0.6;
         }
         .upgrade-list {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
-            max-height: 500px;
+            gap: 0.4rem;
+            max-height: 400px;
             overflow-y: auto;
-            padding-right: 0.5rem;
         }
         .upgrade-item {
             background: #f8f9fa;
-            border-radius: 60px;
-            padding: 0.6rem 1rem 0.6rem 1.5rem;
+            border-radius: 40px;
+            padding: 0.5rem 1rem 0.5rem 1.2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -72,83 +157,258 @@
         }
         .upgrade-item:hover {
             background: #e9ecef;
-            transform: translateX(4px);
         }
         .upgrade-name {
             font-weight: 500;
+            font-size: 0.9rem;
         }
         .upgrade-price {
             font-family: monospace;
             font-weight: 600;
             color: #2c3e66;
+            font-size: 0.85rem;
         }
         button {
             background: #2c3e66;
             border: none;
             color: white;
             font-weight: bold;
-            padding: 0.4rem 1.2rem;
+            padding: 0.3rem 1rem;
             border-radius: 40px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             transition: background 0.2s;
-            margin-left: 1rem;
+            margin-left: 0.5rem;
         }
         button:hover {
             background: #1e2a44;
         }
-        button:active {
-            transform: scale(0.96);
+        
+        /* Right Column - Receipt/Invoice */
+        .receipt-section {
+            background: #fef9e6;
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 2px solid #e9c46a;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .receipt-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px dashed #e9c46a;
+            color: #2a9d8f;
+        }
+        .total-display {
+            background: #2a9d8f;
+            color: white;
+            padding: 0.8rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .total-display .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .total-display .amount {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .purchased-items {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .purchased-items h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.85rem;
+            color: #e76f51;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.3rem;
+        }
+        .purchased-list {
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+        .purchased-list span {
+            font-family: monospace;
+            font-weight: bold;
+        }
+        .repair-cost-field {
+            margin-bottom: 1rem;
+        }
+        .repair-cost-field label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+            color: #264653;
+        }
+        .repair-cost-field input {
+            width: 100%;
+            padding: 0.6rem;
+            border-radius: 8px;
+            border: 2px solid #e9c46a;
+            font-size: 1rem;
+            outline: none;
+        }
+        .repair-cost-field input:focus {
+            border-color: #2a9d8f;
+        }
+        .info-line {
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            padding: 0.3rem 0;
+            border-bottom: 1px dotted #ddd;
+        }
+        .info-line strong {
+            color: #e76f51;
+        }
+        .shop-field {
+            margin-top: 1rem;
+            background: #fff3cd;
+            padding: 0.8rem;
+            border-radius: 12px;
+        }
+        .shop-field label {
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: #856404;
+        }
+        .shop-field input {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid #ffc107;
+            margin-top: 0.3rem;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+        .action-buttons button {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
         }
         .reset-btn {
-            background: #adb5bd;
-            margin-left: 1rem;
-        }
-        .reset-btn:hover {
             background: #6c757d;
+        }
+        .print-btn {
+            background: #2a9d8f;
         }
         .footer {
             margin-top: 2rem;
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #6c757d;
             border-top: 1px solid #dee2e6;
-            padding-top: 1.5rem;
-        }
-        @media (max-width: 550px) {
-            .upgrade-item {
-                flex-wrap: wrap;
-                gap: 0.5rem;
-                border-radius: 1rem;
-            }
-            button {
-                margin-left: auto;
-            }
+            padding-top: 1rem;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>🚗 Car Upgrades</h1>
-    <div class="total-bar">
-        <span class="total-label">💰 TOTAL SPENT</span>
-        <span class="total-amount">$<span id="totalValue">0</span></span>
+    <h1>🚗 Hayes Auto Shop</h1>
+    
+    <div class="main-grid">
+        <!-- LEFT COLUMN: Customer & Upgrades -->
+        <div>
+            <!-- Customer Information -->
+            <div class="customer-section">
+                <div class="customer-title">📋 CUSTOMER & VEHICLE INFORMATION</div>
+                <div class="customer-grid">
+                    <div class="customer-field">
+                        <label>Customer Name</label>
+                        <input type="text" id="customerName" placeholder="Enter customer name...">
+                    </div>
+                    <div class="customer-field">
+                        <label>Vehicle | Make/Model</label>
+                        <input type="text" id="vehicleModel" placeholder="e.g., Honda Civic, Ford Mustang...">
+                    </div>
+                    <div class="customer-field">
+                        <label>Plate Number</label>
+                        <input type="text" id="plateNumber" placeholder="ABC-1234">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Upgrades List with Search -->
+            <div class="upgrades-section" style="margin-top: 1rem;">
+                <div class="upgrades-header">
+                    <span>🔧 Available Upgrades</span>
+                    <button id="clearCartBtn" style="background: #dc3545; padding: 0.3rem 0.8rem;">Clear Cart</button>
+                </div>
+                <div class="search-area">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search upgrades...">
+                </div>
+                <div class="upgrade-list" id="upgradesContainer"></div>
+            </div>
+        </div>
+        
+        <!-- RIGHT COLUMN: Receipt / Invoice -->
+        <div class="receipt-section">
+            <div class="receipt-title">🧾 INVOICE / RECEIPT</div>
+            
+            <div class="total-display">
+                <div class="label">TOTAL PRICE CHARGED</div>
+                <div class="amount">$<span id="totalValue">0</span></div>
+            </div>
+            
+            <div class="purchased-items">
+                <h4>📦 UPGRADES PURCHASED (with quantities)</h4>
+                <div class="purchased-list" id="purchasedList">
+                    <em style="color: #999;">No upgrades added yet</em>
+                </div>
+            </div>
+            
+            <div class="repair-cost-field">
+                <label>🔧 REPAIR COST:</label>
+                <input type="text" id="repairCost" placeholder="Enter repair cost...">
+            </div>
+            
+            <div class="info-line">
+                <strong>Customer Name:</strong> <span id="receiptCustomerName">—</span>
+            </div>
+            <div class="info-line">
+                <strong>Vehicle | Make/Model:</strong> <span id="receiptVehicleModel">—</span>
+            </div>
+            <div class="info-line">
+                <strong>Plate:</strong> <span id="receiptPlateNumber">—</span>
+            </div>
+            <div class="info-line">
+                <strong>Upgrades Purchased:</strong> <span id="receiptUpgradesSummary">None</span>
+            </div>
+            <div class="info-line">
+                <strong>Price Charged:</strong> $<span id="receiptPriceCharged">0</span>
+            </div>
+            
+            <div class="shop-field">
+                <label>🏪 SHOP NAME:</label>
+                <input type="text" id="shopName" value="Hayes" placeholder="Shop name">
+            </div>
+            
+            <div class="action-buttons">
+                <button class="reset-btn" id="resetAllBtn">Reset Total</button>
+                <button class="print-btn" id="printBtn">🖨️ Print Invoice</button>
+            </div>
+        </div>
     </div>
-
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
-        <button class="reset-btn" id="resetAllBtn">⟳ Reset all upgrades</button>
-    </div>
-
-    <div class="upgrade-list" id="upgradesContainer">
-        <!-- JavaScript will inject the list here -->
-    </div>
+    
     <div class="footer">
-        ⚡ Click any upgrade to add it to your build • Real-time total
+        ⚡ Click any upgrade to add • Quantities tracked automatically • Data saves locally
     </div>
 </div>
 
 <script>
-    // ----- UPGRADE DATABASE (mirroring your original list) -----
+    // ----- UPGRADE DATABASE -----
     const upgradesData = [
         { name: "Arch Cover", price: 500 },{ name: "Aerial", price: 500 },{ name: "Armor 2", price: 4250 },
         { name: "Armor 3", price: 6500 },{ name: "Armor 4", price: 10450 },{ name: "Armor 5", price: 14250 },
@@ -171,47 +431,144 @@
         { name: "Turbo", price: 11000 },{ name: "Tire Smoke", price: 500 }
     ];
 
-    // ----- Load saved total from localStorage OR start at 0 -----
+    // Track quantities of purchased upgrades
+    let cart = {};  // { "Armor 2": { price: 4250, quantity: 2 }, ... }
     let currentTotal = 0;
-    try {
-        const saved = localStorage.getItem('carUpgradesTotal');
-        if (saved !== null && !isNaN(parseInt(saved))) {
-            currentTotal = parseInt(saved);
-        }
-    } catch(e) { /* private browsing fallback */ }
+    let currentFilter = '';
 
-    // ----- Helper: update UI total & localStorage -----
-    function updateTotalUI() {
-        const totalSpan = document.getElementById('totalValue');
-        if (totalSpan) totalSpan.innerText = currentTotal;
+    // Load saved data
+    function loadData() {
         try {
+            const savedCart = localStorage.getItem('upgradeCart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                recalculateTotal();
+            }
+            const savedTotal = localStorage.getItem('carUpgradesTotal');
+            if (savedTotal !== null && !isNaN(parseInt(savedTotal))) {
+                currentTotal = parseInt(savedTotal);
+            }
+            // Load customer info
+            const savedName = localStorage.getItem('customerName');
+            const savedVehicle = localStorage.getItem('vehicleModel');
+            const savedPlate = localStorage.getItem('plateNumber');
+            const savedShop = localStorage.getItem('shopName');
+            const savedRepair = localStorage.getItem('repairCost');
+            if (savedName) document.getElementById('customerName').value = savedName;
+            if (savedVehicle) document.getElementById('vehicleModel').value = savedVehicle;
+            if (savedPlate) document.getElementById('plateNumber').value = savedPlate;
+            if (savedShop) document.getElementById('shopName').value = savedShop;
+            if (savedRepair) document.getElementById('repairCost').value = savedRepair;
+        } catch(e) {}
+        updateAllUI();
+    }
+
+    function saveCart() {
+        try {
+            localStorage.setItem('upgradeCart', JSON.stringify(cart));
             localStorage.setItem('carUpgradesTotal', currentTotal);
         } catch(e) {}
     }
 
-    // ----- Add upgrade price -----
-    function addUpgrade(price, upgradeName) {
-        if (isNaN(price)) return;
-        currentTotal += price;
-        updateTotalUI();
-        // (Optional) small console feedback, not intrusive
-        console.log(`➕ Added ${upgradeName}: $${price} → Total $${currentTotal}`);
+    function saveCustomerInfo() {
+        try {
+            localStorage.setItem('customerName', document.getElementById('customerName').value);
+            localStorage.setItem('vehicleModel', document.getElementById('vehicleModel').value);
+            localStorage.setItem('plateNumber', document.getElementById('plateNumber').value);
+        } catch(e) {}
+        updateReceiptInfo();
     }
 
-    // ----- Reset everything -----
-    function resetTotal() {
+    function saveShopInfo() {
+        try {
+            localStorage.setItem('shopName', document.getElementById('shopName').value);
+        } catch(e) {}
+    }
+
+    function saveRepairCost() {
+        try {
+            localStorage.setItem('repairCost', document.getElementById('repairCost').value);
+        } catch(e) {}
+    }
+
+    function recalculateTotal() {
         currentTotal = 0;
-        updateTotalUI();
-        console.log("🔄 All upgrades reset to $0");
+        for (let key in cart) {
+            currentTotal += cart[key].price * cart[key].quantity;
+        }
+        saveCart();
     }
 
-    // ----- Render the full list dynamically -----
+    function addUpgrade(name, price) {
+        if (cart[name]) {
+            cart[name].quantity++;
+        } else {
+            cart[name] = { price: price, quantity: 1 };
+        }
+        recalculateTotal();
+        updateAllUI();
+    }
+
+    function clearCart() {
+        cart = {};
+        currentTotal = 0;
+        saveCart();
+        updateAllUI();
+    }
+
+    function resetTotal() {
+        clearCart();
+    }
+
+    function updatePurchasedList() {
+        const container = document.getElementById('purchasedList');
+        const keys = Object.keys(cart);
+        if (keys.length === 0) {
+            container.innerHTML = '<em style="color: #999;">No upgrades added yet</em>';
+            document.getElementById('receiptUpgradesSummary').innerText = 'None';
+            return;
+        }
+        
+        let html = '';
+        let summaryText = '';
+        keys.forEach(key => {
+            const item = cart[key];
+            html += `<div>• ${key} <span style="float: right;">x${item.quantity} - $${(item.price * item.quantity).toLocaleString()}</span></div>`;
+            summaryText += `${key} x${item.quantity}, `;
+        });
+        container.innerHTML = html;
+        document.getElementById('receiptUpgradesSummary').innerText = summaryText.slice(0, -2);
+    }
+
+    function updateReceiptInfo() {
+        document.getElementById('receiptCustomerName').innerText = document.getElementById('customerName').value || '—';
+        document.getElementById('receiptVehicleModel').innerText = document.getElementById('vehicleModel').value || '—';
+        document.getElementById('receiptPlateNumber').innerText = document.getElementById('plateNumber').value || '—';
+        document.getElementById('receiptPriceCharged').innerText = currentTotal.toLocaleString();
+        document.getElementById('totalValue').innerText = currentTotal.toLocaleString();
+    }
+
+    function updateAllUI() {
+        updatePurchasedList();
+        updateReceiptInfo();
+        renderUpgradeList();
+    }
+
     function renderUpgradeList() {
         const container = document.getElementById('upgradesContainer');
         if (!container) return;
 
         container.innerHTML = '';
-        for (let item of upgradesData) {
+        const filteredUpgrades = upgradesData.filter(item => 
+            item.name.toLowerCase().includes(currentFilter.toLowerCase())
+        );
+
+        if (filteredUpgrades.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 1rem; color: #6c757d;">🔍 No upgrades match</div>';
+            return;
+        }
+
+        for (let item of filteredUpgrades) {
             const div = document.createElement('div');
             div.className = 'upgrade-item';
 
@@ -225,11 +582,7 @@
 
             const btn = document.createElement('button');
             btn.textContent = '+ Add';
-            btn.setAttribute('aria-label', `Add ${item.name}`);
-            // Use closure to capture current item's price and name
-            btn.addEventListener('click', (function(price, name) {
-                return function() { addUpgrade(price, name); };
-            })(item.price, item.name));
+            btn.addEventListener('click', () => addUpgrade(item.name, item.price));
 
             div.appendChild(nameSpan);
             div.appendChild(priceSpan);
@@ -238,15 +591,69 @@
         }
     }
 
-    // ----- Initialize page -----
-    function init() {
-        renderUpgradeList();
-        updateTotalUI();
-
-        const resetBtn = document.getElementById('resetAllBtn');
-        if (resetBtn) {
-            resetBtn.addEventListener('click', resetTotal);
+    function printInvoice() {
+        const printWindow = window.open('', '_blank');
+        const shopName = document.getElementById('shopName').value || 'Hayes';
+        const customerName = document.getElementById('customerName').value || '—';
+        const vehicleModel = document.getElementById('vehicleModel').value || '—';
+        const plateNumber = document.getElementById('plateNumber').value || '—';
+        const repairCost = document.getElementById('repairCost').value || '—';
+        
+        let upgradesHtml = '';
+        for (let key in cart) {
+            upgradesHtml += `<li>${key} x${cart[key].quantity} - $${(cart[key].price * cart[key].quantity).toLocaleString()}</li>`;
         }
+        
+        printWindow.document.write(`
+            <html>
+            <head><title>Invoice - ${shopName}</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 2rem; max-width: 600px; margin: auto; }
+                h1 { color: #2a9d8f; }
+                .invoice-box { border: 2px solid #e9c46a; padding: 1.5rem; border-radius: 12px; }
+                .total { font-size: 1.5rem; font-weight: bold; color: #e76f51; }
+                hr { margin: 1rem 0; }
+            </style>
+            </head>
+            <body>
+            <div class="invoice-box">
+                <h1>${shopName} Auto Shop</h1>
+                <hr>
+                <p><strong>Customer:</strong> ${customerName}</p>
+                <p><strong>Vehicle:</strong> ${vehicleModel}</p>
+                <p><strong>Plate:</strong> ${plateNumber}</p>
+                <p><strong>Repair Cost:</strong> ${repairCost}</p>
+                <hr>
+                <h3>Upgrades Purchased:</h3>
+                <ul>${upgradesHtml || '<li>None</li>'}</ul>
+                <hr>
+                <p class="total">Total Charged: $${currentTotal.toLocaleString()}</p>
+                <p><em>Thank you for your business!</em></p>
+            </div>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    }
+
+    // Initialize
+    function init() {
+        loadData();
+        
+        // Event listeners
+        document.getElementById('customerName').addEventListener('input', () => { saveCustomerInfo(); updateReceiptInfo(); });
+        document.getElementById('vehicleModel').addEventListener('input', () => { saveCustomerInfo(); updateReceiptInfo(); });
+        document.getElementById('plateNumber').addEventListener('input', () => { saveCustomerInfo(); updateReceiptInfo(); });
+        document.getElementById('shopName').addEventListener('input', saveShopInfo);
+        document.getElementById('repairCost').addEventListener('input', saveRepairCost);
+        document.getElementById('resetAllBtn').addEventListener('click', resetTotal);
+        document.getElementById('clearCartBtn').addEventListener('click', clearCart);
+        document.getElementById('printBtn').addEventListener('click', printInvoice);
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            currentFilter = e.target.value;
+            renderUpgradeList();
+        });
     }
 
     init();
