@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Upgrades</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            overflow: hidden;
+            padding: 1.5rem;
+        }
+        h1 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.8rem;
+        }
+        .total-bar {
+            background: #1a1a2e;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .total-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+        .total-amount {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: monospace;
+        }
+        .upgrade-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        .upgrade-item {
+            background: #f8f9fa;
+            border-radius: 60px;
+            padding: 0.6rem 1rem 0.6rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            border: 1px solid #e9ecef;
+        }
+        .upgrade-item:hover {
+            background: #e9ecef;
+            transform: translateX(4px);
+        }
+        .upgrade-name {
+            font-weight: 500;
+        }
+        .upgrade-price {
+            font-family: monospace;
+            font-weight: 600;
+            color: #2c3e66;
+        }
+        button {
+            background: #2c3e66;
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+            margin-left: 1rem;
+        }
+        button:hover {
+            background: #1e2a44;
+        }
+        button:active {
+            transform: scale(0.96);
+        }
+        .reset-btn {
+            background: #adb5bd;
+            margin-left: 1rem;
+        }
+        .reset-btn:hover {
+            background: #6c757d;
+        }
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+            padding-top: 1.5rem;
+        }
+        @media (max-width: 550px) {
+            .upgrade-item {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                border-radius: 1rem;
+            }
+            button {
+                margin-left: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🚗 Car Upgrades</h1>
+    <div class="total-bar">
+        <span class="total-label">💰 TOTAL SPENT</span>
+        <span class="total-amount">$<span id="totalValue">0</span></span>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+        <button class="reset-btn" id="resetAllBtn">⟳ Reset all upgrades</button>
+    </div>
+
+    <div class="upgrade-list" id="upgradesContainer">
+        <!-- JavaScript will inject the list here -->
+    </div>
+    <div class="footer">
+        ⚡ Click any upgrade to add it to your build • Real-time total
+    </div>
+</div>
+
+<script>
+    // ----- UPGRADE DATABASE (mirroring your original list) -----
+    const upgradesData = [
+        { name: "Arch Cover", price: 500 },{ name: "Aerial", price: 500 },{ name: "Armor 2", price: 4250 },
+        { name: "Armor 3", price: 6500 },{ name: "Armor 4", price: 10450 },{ name: "Armor 5", price: 14250 },
+        { name: "Armor 6", price: 19500 },{ name: "Brakes 2", price: 4250 },{ name: "Brakes 3", price: 6500 },
+        { name: "Brakes 4", price: 10450 },{ name: "Custom Tires", price: 700 },{ name: "Dashboard Color", price: 1100 },
+        { name: "Dial", price: 500 },{ name: "Engine 2", price: 4250 },{ name: "Engine 3", price: 6500 },
+        { name: "Engine 4", price: 10450 },{ name: "Engine 5", price: 14250 },{ name: "Engine Block", price: 500 },
+        { name: "Exhaust", price: 500 },{ name: "Front Bumper", price: 500 },{ name: "Grille", price: 500 },
+        { name: "Hood", price: 500 },{ name: "Interior Respray", price: 1100 },{ name: "Left Fender", price: 500 },
+        { name: "Livery", price: 500 },{ name: "Ornaments", price: 500 },{ name: "Old Livery", price: 200 },
+        { name: "P Respray", price: 1100 },{ name: "Pearlescent Respray", price: 1100 },{ name: "Plate Index", price: 1100 },
+        { name: "Rear Bumper", price: 500 },{ name: "Rim Color", price: 1100 },{ name: "Right Fender", price: 500 },
+        { name: "Rims", price: 500 },{ name: "Roof", price: 500 },{ name: "Roll Cage", price: 500 },
+        { name: "Seats", price: 500 },{ name: "Side Skirt", price: 500 },{ name: "S Respray", price: 1100 },
+        { name: "Spoiler", price: 500 },{ name: "Steering Wheel", price: 500 },{ name: "Strut", price: 500 },
+        { name: "Speaker", price: 500 },{ name: "Suspension 2", price: 4250 },{ name: "Suspension 3", price: 6500 },
+        { name: "Suspension 4", price: 10450 },{ name: "Suspension 5", price: 14250 },{ name: "Tint", price: 500 },
+        { name: "Trunk", price: 500 },{ name: "Trim A", price: 500 },{ name: "Trim B", price: 500 },
+        { name: "Transmission 2", price: 4250 },{ name: "Transmission 3", price: 6500 },{ name: "Transmission 4", price: 10450 },
+        { name: "Turbo", price: 11000 },{ name: "Tire Smoke", price: 500 }
+    ];
+
+    // ----- Load saved total from localStorage OR start at 0 -----
+    let currentTotal = 0;
+    try {
+        const saved = localStorage.getItem('carUpgradesTotal');
+        if (saved !== null && !isNaN(parseInt(saved))) {
+            currentTotal = parseInt(saved);
+        }
+    } catch(e) { /* private browsing fallback */ }
+
+    // ----- Helper: update UI total & localStorage -----
+    function updateTotalUI() {
+        const totalSpan = document.getElementById('totalValue');
+        if (totalSpan) totalSpan.innerText = currentTotal;
+        try {
+            localStorage.setItem('carUpgradesTotal', currentTotal);
+        } catch(e) {}
+    }
+
+    // ----- Add upgrade price -----
+    function addUpgrade(price, upgradeName) {
+        if (isNaN(price)) return;
+        currentTotal += price;
+        updateTotalUI();
+        // (Optional) small console feedback, not intrusive
+        console.log(`➕ Added ${upgradeName}: $${price} → Total $${currentTotal}`);
+    }
+
+    // ----- Reset everything -----
+    function resetTotal() {
+        currentTotal = 0;
+        updateTotalUI();
+        console.log("🔄 All upgrades reset to $0");
+    }
+
+    // ----- Render the full list dynamically -----
+    function renderUpgradeList() {
+        const container = document.getElementById('upgradesContainer');
+        if (!container) return;
+
+        container.innerHTML = '';
+        for (let item of upgradesData) {
+            const div = document.createElement('div');
+            div.className = 'upgrade-item';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'upgrade-name';
+            nameSpan.textContent = item.name;
+
+            const priceSpan = document.createElement('span');
+            priceSpan.className = 'upgrade-price';
+            priceSpan.textContent = `$${item.price}`;
+
+            const btn = document.createElement('button');
+            btn.textContent = '+ Add';
+            btn.setAttribute('aria-label', `Add ${item.name}`);
+            // Use closure to capture current item's price and name
+            btn.addEventListener('click', (function(price, name) {
+                return function() { addUpgrade(price, name); };
+            })(item.price, item.name));
+
+            div.appendChild(nameSpan);
+            div.appendChild(priceSpan);
+            div.appendChild(btn);
+            container.appendChild(div);
+        }
+    }
+
+    // ----- Initialize page -----
+    function init() {
+        renderUpgradeList();
+        updateTotalUI();
+
+        const resetBtn = document.getElementById('resetAllBtn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', resetTotal);
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
